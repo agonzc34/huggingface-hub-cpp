@@ -1,0 +1,59 @@
+\doxysection{huggingface\+\_\+hub.\+h}
+\hypertarget{huggingface__hub_8h_source}{}\label{huggingface__hub_8h_source}\index{include/huggingface\_hub.h@{include/huggingface\_hub.h}}
+\mbox{\hyperlink{huggingface__hub_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ MIT\ License}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Copyright\ (c)\ 2025\ Alejandro\ González\ Cantón}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ Copyright\ (c)\ 2025\ Miguel\ Ángel\ González\ Santamarta}}
+\DoxyCodeLine{00005\ \textcolor{comment}{//}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//\ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy}}
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ of\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//\ in\ the\ Software\ without\ restriction,\ including\ without\ limitation\ the\ rights}}
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ to\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,\ sublicense,\ and/or\ sell}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ copies\ of\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is}}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ furnished\ to\ do\ so,\ subject\ to\ the\ following\ conditions:}}
+\DoxyCodeLine{00012\ \textcolor{comment}{//}}
+\DoxyCodeLine{00013\ \textcolor{comment}{//\ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in}}
+\DoxyCodeLine{00014\ \textcolor{comment}{//\ all\ copies\ or\ substantial\ portions\ of\ the\ Software.}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{comment}{//\ THE\ SOFTWARE\ IS\ PROVIDED\ "{}AS\ IS"{},\ WITHOUT\ WARRANTY\ OF\ ANY\ KIND,\ EXPRESS\ OR}}
+\DoxyCodeLine{00017\ \textcolor{comment}{//\ IMPLIED,\ INCLUDING\ BUT\ NOT\ LIMITED\ TO\ THE\ WARRANTIES\ OF\ MERCHANTABILITY,}}
+\DoxyCodeLine{00018\ \textcolor{comment}{//\ FITNESS\ FOR\ A\ PARTICULAR\ PURPOSE\ AND\ NONINFRINGEMENT.\ IN\ NO\ EVENT\ SHALL\ THE}}
+\DoxyCodeLine{00019\ \textcolor{comment}{//\ AUTHORS\ OR\ COPYRIGHT\ HOLDERS\ BE\ LIABLE\ FOR\ ANY\ CLAIM,\ DAMAGES\ OR\ OTHER}}
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ LIABILITY,\ WHETHER\ IN\ AN\ ACTION\ OF\ CONTRACT,\ TORT\ OR\ OTHERWISE,\ ARISING\ FROM,}}
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ OUT\ OF\ OR\ IN\ CONNECTION\ WITH\ THE\ SOFTWARE\ OR\ THE\ USE\ OR\ OTHER\ DEALINGS\ IN\ THE}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ SOFTWARE.}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifndef\ HUGGINGFACE\_HUB\_H}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ HUGGINGFACE\_HUB\_H}}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <variant>}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{keyword}{namespace\ }huggingface\_hub\ \{}
+\DoxyCodeLine{00046\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata}{FileMetadata}}\ \{}
+\DoxyCodeLine{00047\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a8bbce1e5952c9affbb4031943b75a10a}{sha256}};\ }
+\DoxyCodeLine{00048\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a22d15e8283b88cf7ba2f4f60a2524f97}{commit}};\ }
+\DoxyCodeLine{00049\ \ \ uint64\_t\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a18dac81998e7a3bbfca056f8b2a94c91}{size}};\ \ \ \ \ \ }
+\DoxyCodeLine{00050\ \};}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00059\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}\ \{}
+\DoxyCodeLine{00060\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult_ada5de79cc0c19aab4edc7c7fafdef60b}{success}};\ \ \ \ \ }
+\DoxyCodeLine{00061\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult_aabc672c9999b34626802cedc1dcc96d1}{path}};\ }
+\DoxyCodeLine{00062\ \};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00075\ std::variant<struct\ FileMetadata,\ std::string>}
+\DoxyCodeLine{00076\ \mbox{\hyperlink{huggingface__hub_8h_aa34e943029e0aff3b708b6801c108953}{get\_model\_metadata\_from\_hf}}(\textcolor{keyword}{const}\ std::string\ \&repo,\ \textcolor{keyword}{const}\ std::string\ \&file);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00093\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}}
+\DoxyCodeLine{00094\ \mbox{\hyperlink{huggingface__hub_8h_ad3bc4085f79006e58fb551cadf2083aa}{hf\_hub\_download}}(const\ std::string\ \&repo\_id,\ const\ std::string\ \&filename,}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ std::string\ \&cache\_dir\ =\ "{}\string~/.cache/huggingface/hub"{},}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bool\ force\_download\ =\ false);}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ HUGGINGFACE\_HUB\_H}}
+\DoxyCodeLine{00099\ \}\ \textcolor{comment}{//\ namespace\ huggingface\_hub}}
+
+\end{DoxyCode}
