@@ -29,6 +29,8 @@ struct \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{huggingface\+\
 std\+::variant$<$ struct \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata}{File\+Metadata}}, std\+::string $>$ \mbox{\hyperlink{huggingface__hub_8h_aa34e943029e0aff3b708b6801c108953}{huggingface\+\_\+hub\+::get\+\_\+model\+\_\+metadata\+\_\+from\+\_\+hf}} (const std\+::string \&repo, const std\+::string \&file)
 \begin{DoxyCompactList}\small\item\em Get metadata of a model file from Hugging Face Hub. \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{Download\+Result}} \mbox{\hyperlink{huggingface__hub_8h_ad3bc4085f79006e58fb551cadf2083aa}{huggingface\+\_\+hub\+::hf\+\_\+hub\+\_\+download}} (const std\+::string \&repo\+\_\+id, const std\+::string \&filename, const std\+::string \&cache\+\_\+dir="{}\texorpdfstring{$\sim$}{\string~}/.cache/huggingface/hub"{}, bool force\+\_\+download=false)
+\begin{DoxyCompactList}\small\item\em Download a file from Hugging Face Hub. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{Download\+Result}} \mbox{\hyperlink{huggingface__hub_8h_a3d36f787415e7ea30d63b9f537316fea}{huggingface\+\_\+hub\+::hf\+\_\+hub\+\_\+download\+\_\+with\+\_\+shards}} (const std\+::string \&repo\+\_\+id, const std\+::string \&filename, const std\+::string \&cache\+\_\+dir="{}\texorpdfstring{$\sim$}{\string~}/.cache/huggingface/hub"{}, bool force\+\_\+download=false)
 \begin{DoxyCompactList}\small\item\em Download a file from Hugging Face Hub. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
@@ -65,6 +67,32 @@ A variant containing either the File\+Metadata structure or an error message str
 \doxysubsubsection{\texorpdfstring{hf\_hub\_download()}{hf\_hub\_download()}}
 {\footnotesize\ttfamily \label{huggingface__hub_8h_ad3bc4085f79006e58fb551cadf2083aa} 
 struct Download\+Result huggingface\+\_\+hub\+::hf\+\_\+hub\+\_\+download (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{repo\+\_\+id}{, }\item[{const std\+::string \&}]{filename}{, }\item[{const std\+::string \&}]{cache\+\_\+dir}{ = {\ttfamily "{}\texorpdfstring{$\sim$}{\string~}/.cache/huggingface/hub"{}}, }\item[{bool}]{force\+\_\+download}{ = {\ttfamily false}}\end{DoxyParamCaption})}
+
+
+
+Download a file from Hugging Face Hub. 
+
+This function downloads a specified file from a given repository on the Hugging Face Hub and saves it to the specified cache directory.
+
+
+\begin{DoxyParams}{Parameters}
+{\em repo\+\_\+id} & The repository ID. \\
+\hline
+{\em filename} & The name of the file to download. \\
+\hline
+{\em cache\+\_\+dir} & The directory to cache the downloaded file. Default is "{}\texorpdfstring{$\sim$}{\string~}/.\+cache/huggingface/hub"{}. \\
+\hline
+{\em force\+\_\+download} & If true, forces the download even if the file already exists in the cache. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A Download\+Result structure containing the success status and the path of the downloaded file. 
+\end{DoxyReturn}
+\Hypertarget{huggingface__hub_8h_a3d36f787415e7ea30d63b9f537316fea}\index{huggingface\_hub.h@{huggingface\_hub.h}!hf\_hub\_download\_with\_shards@{hf\_hub\_download\_with\_shards}}
+\index{hf\_hub\_download\_with\_shards@{hf\_hub\_download\_with\_shards}!huggingface\_hub.h@{huggingface\_hub.h}}
+\doxysubsubsection{\texorpdfstring{hf\_hub\_download\_with\_shards()}{hf\_hub\_download\_with\_shards()}}
+{\footnotesize\ttfamily \label{huggingface__hub_8h_a3d36f787415e7ea30d63b9f537316fea} 
+struct Download\+Result huggingface\+\_\+hub\+::hf\+\_\+hub\+\_\+download\+\_\+with\+\_\+shards (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{repo\+\_\+id}{, }\item[{const std\+::string \&}]{filename}{, }\item[{const std\+::string \&}]{cache\+\_\+dir}{ = {\ttfamily "{}\texorpdfstring{$\sim$}{\string~}/.cache/huggingface/hub"{}}, }\item[{bool}]{force\+\_\+download}{ = {\ttfamily false}}\end{DoxyParamCaption})}
 
 
 

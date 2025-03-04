@@ -134,6 +134,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ad3bc4085f79006e58fb551cadf2083aa" id="r_ad3bc4085f79006e58fb551cadf2083aa"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structhuggingface__hub_1_1DownloadResult.html">DownloadResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3bc4085f79006e58fb551cadf2083aa">huggingface_hub::hf_hub_download</a> (const std::string &amp;repo_id, const std::string &amp;filename, const std::string &amp;cache_dir=&quot;~/.cache/huggingface/hub&quot;, bool force_download=false)</td></tr>
 <tr class="memdesc:ad3bc4085f79006e58fb551cadf2083aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Download a file from Hugging Face Hub.  <br /></td></tr>
 <tr class="separator:ad3bc4085f79006e58fb551cadf2083aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d36f787415e7ea30d63b9f537316fea" id="r_a3d36f787415e7ea30d63b9f537316fea"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structhuggingface__hub_1_1DownloadResult.html">DownloadResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3d36f787415e7ea30d63b9f537316fea">huggingface_hub::hf_hub_download_with_shards</a> (const std::string &amp;repo_id, const std::string &amp;filename, const std::string &amp;cache_dir=&quot;~/.cache/huggingface/hub&quot;, bool force_download=false)</td></tr>
+<tr class="memdesc:a3d36f787415e7ea30d63b9f537316fea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Download a file from Hugging Face Hub.  <br /></td></tr>
+<tr class="separator:a3d36f787415e7ea30d63b9f537316fea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Header file for Hugging Face Hub C++ API. </p>
@@ -179,6 +182,50 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">struct DownloadResult huggingface_hub::hf_hub_download </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>repo_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>filename</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>cache_dir</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;~/.cache/huggingface/hub&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>force_download</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Download a file from Hugging Face Hub. </p>
+<p>This function downloads a specified file from a given repository on the Hugging Face Hub and saves it to the specified cache directory.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">repo_id</td><td>The repository ID. </td></tr>
+    <tr><td class="paramname">filename</td><td>The name of the file to download. </td></tr>
+    <tr><td class="paramname">cache_dir</td><td>The directory to cache the downloaded file. Default is "~/.cache/huggingface/hub". </td></tr>
+    <tr><td class="paramname">force_download</td><td>If true, forces the download even if the file already exists in the cache. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A DownloadResult structure containing the success status and the path of the downloaded file. </dd></dl>
+
+</div>
+</div>
+<a id="a3d36f787415e7ea30d63b9f537316fea" name="a3d36f787415e7ea30d63b9f537316fea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d36f787415e7ea30d63b9f537316fea">&#9670;&#160;</a></span>hf_hub_download_with_shards()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct DownloadResult huggingface_hub::hf_hub_download_with_shards </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>repo_id</em></span>, </td>
         </tr>
