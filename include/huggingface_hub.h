@@ -44,9 +44,11 @@ namespace huggingface_hub {
  * This structure contains the SHA-256 hash, commit ID, and size of a file.
  */
 struct FileMetadata {
-  std::string sha256; /**< SHA-256 hash of the file */
   std::string commit; /**< Commit ID of the file */
+  std::string type;   /**< Type of the file (e.g., "model", "dataset") */
+  std::string oid;    /**< Object ID of the file */
   uint64_t size;      /**< Size of the file in bytes */
+  std::string sha256; /**< SHA-256 hash of the file */
 };
 
 /**

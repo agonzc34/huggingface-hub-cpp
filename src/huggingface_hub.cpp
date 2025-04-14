@@ -29,12 +29,12 @@
 #include <iomanip>
 #include <regex>
 #include <sstream>
-#include <sys/ioctl.h>
-#include <unistd.h>
 
 #include <curl/curl.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "huggingface_hub.h"
 
@@ -136,64 +136,63 @@ size_t write_file_data(void *ptr, size_t size, size_t nmemb, void *stream) {
   return size * nmemb;
 }
 
-// Function to extract SHA256 from Git LFS metadata
-std::string extract_SHA256(const std::string &response) {
-  std::istringstream stream(response);
-  std::string line;
+// Extract metadata from JSON response
+FileMetadata extract_metadata(const std::string &json) {
+  FileMetadata metadata;
 
-  while (std::getline(stream, line)) {
-    if (line.find("oid sha256:") != std::string::npos) {
-      auto result =
-          line.substr(line.find("sha256:") + 7); // Extract after "sha256:"
-      stream.str("");                            // Clear the stream
-      return result;
-    }
-  }
-  return ""; // Return empty if not found
-}
+  std::smatch match;
 
-uint64_t extract_file_size(const std::string &response) {
-  std::istringstream stream(response);
-  std::string line;
-  uint64_t size = 0;
+  // Extract "type"
+  if (std::regex_search(json, match,
+                        std::regex(R"(\"type\"\s*:\s*\"([^"]+)\")")))
+    metadata.type = match[1];
 
-  while (std::getline(stream, line)) {
-    if (line.find("size ") != std::string::npos) {
-      std::string sizeStr = line.substr(5); // Extract after "size "
-      size = std::stoull(sizeStr);
-      return size;
-    }
-  }
-  return 0; // Return empty if not found
-}
+  // Extract "oid" (top-level one)
+  if (std::regex_search(json, match,
+                        std::regex(R"(\"oid\"\s*:\s*\"([a-f0-9]{40})\")")))
+    metadata.oid = match[1];
 
-std::string extract_commit(const std::string &response) {
-  std::istringstream stream(response);
-  std::string line;
+  // Extract "size"
+  if (std::regex_search(json, match, std::regex(R"(\"size\"\s*:\s*(\d+))")))
+    metadata.size = std::stoull(match[1]);
 
-  while (std::getline(stream, line)) {
-    if (line.find("x-repo-commit:") != std::string::npos) {
-      auto result = line.substr(line.find(":") + 2); // Extract after ": "
-      result.erase(result.find_last_not_of(" \n\r\t") +
-                   1); // Trim trailing whitespace
-      return result;
-    }
-  }
-  return ""; // Return empty if not found
+  // Extract "lfs" SHA-256 hash
+  if (std::regex_search(
+          json, match,
+          std::regex(
+              R"(\"lfs\"\s*:\s*\{[^}]*\"oid\"\s*:\s*\"([a-f0-9]{64})\")")))
+    metadata.sha256 = match[1];
+
+  // Extract "commit" ID
+  if (std::regex_search(
+          json, match,
+          std::regex(
+              R"(\"lastCommit\"\s*:\s*\{[^}]*\"id\"\s*:\s*\"([a-f0-9]{40})\")")))
+    metadata.commit = match[1];
+
+  return metadata;
 }
 
 std::variant<struct FileMetadata, std::string>
 get_model_metadata_from_hf(const std::string &repo, const std::string &file) {
-  struct FileMetadata metadata;
-  std::string url = "https://huggingface.co/" + repo + "/raw/main/" + file;
-  std::string response, headers;
-
   CURL *curl = curl_easy_init();
   if (!curl) {
     return "Failed to initialize CURL";
   }
 
+  std::string response, headers;
+
+  std::string url =
+      "https://huggingface.co/api/models/" + repo + "/paths-info/main";
+  const std::string body = "{\"paths\": [\"" + file + "\"], \"expand\": true}";
+
+  struct curl_slist *http_headers = NULL;
+  http_headers =
+      curl_slist_append(http_headers, "Content-Type: application/json");
+
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_string_data);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -201,17 +200,14 @@ get_model_metadata_from_hf(const std::string &repo, const std::string &file) {
   curl_easy_setopt(curl, CURLOPT_HEADERDATA, &headers);
 
   CURLcode res = curl_easy_perform(curl);
+  curl_slist_free_all(http_headers);
   curl_easy_cleanup(curl);
 
   if (res != CURLE_OK) {
     return "CURL request failed: " + std::string(curl_easy_strerror(res));
   }
 
-  metadata.sha256 = extract_SHA256(response);
-  metadata.size = extract_file_size(response);
-  metadata.commit = extract_commit(headers);
-
-  return metadata;
+  return extract_metadata(response);
 }
 
 int get_terminal_width() {
@@ -348,14 +344,24 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   log_info("Downloading " + filename + " from " + repo_id);
 
   struct FileMetadata metadata = std::get<struct FileMetadata>(metadata_result);
-  log_debug("SHA256: " + metadata.sha256);
   log_debug("Commit: " + metadata.commit);
+  log_debug("Blob ID: " + metadata.oid);
   log_debug("Size: " + std::to_string(metadata.size) + " bytes");
+  log_debug("SHA256: " + metadata.sha256);
 
-  std::filesystem::path blob_file_path(cache_model_dir + "blobs/" +
-                                       metadata.sha256);
-  std::filesystem::path blob_incomplete_file_path(
-      cache_model_dir + "blobs/" + metadata.sha256 + ".incomplete");
+  std::filesystem::path blob_file_path;
+  std::filesystem::path blob_incomplete_file_path;
+
+  if (metadata.sha256.empty()) {
+    blob_file_path = cache_model_dir + "blobs/" + metadata.oid;
+    blob_incomplete_file_path =
+        cache_model_dir + "blobs/" + metadata.oid + ".incomplete";
+  } else {
+    blob_file_path = cache_model_dir + "blobs/" + metadata.sha256;
+    blob_incomplete_file_path =
+        cache_model_dir + "blobs/" + metadata.sha256 + ".incomplete";
+  }
+
   std::filesystem::path snapshot_file_path(cache_model_dir + "snapshots/" +
                                            metadata.commit + "/" + filename);
   std::filesystem::path refs_file_path(cache_model_dir + "refs/main");
@@ -417,18 +423,19 @@ struct DownloadResult hf_hub_download_with_shards(const std::string &repo_id,
                                                   const std::string &cache_dir,
                                                   bool force_download) {
 
-  std::regex pattern(R"(-([0-9]+)-of-([0-9]+)\.gguf)");
+  std::regex pattern(R"(-([0-9]+)-of-([0-9]+)\.(\w+))");
   std::smatch match;
 
   if (std::regex_search(filename, match, pattern)) {
     int total_shards = std::stoi(match[2]);
     std::string base_name = filename.substr(0, match.position(0));
+    std::string extension = match[3];
 
     // Download shards
     for (int i = 1; i <= total_shards; ++i) {
       char shard_file[512];
-      snprintf(shard_file, sizeof(shard_file), "%s-%05d-of-%05d.gguf",
-               base_name.c_str(), i, total_shards);
+      snprintf(shard_file, sizeof(shard_file), "%s-%05d-of-%05d.%s",
+               base_name.c_str(), i, total_shards, extension.c_str());
       auto aux_res =
           hf_hub_download(repo_id, shard_file, cache_dir, force_download);
 
@@ -439,8 +446,8 @@ struct DownloadResult hf_hub_download_with_shards(const std::string &repo_id,
 
     // Return first shard
     char first_shard[512];
-    snprintf(first_shard, sizeof(first_shard), "%s-00001-of-%05d.gguf",
-             base_name.c_str(), total_shards);
+    snprintf(first_shard, sizeof(first_shard), "%s-00001-of-%05d.%s",
+             base_name.c_str(), total_shards, extension.c_str());
     return hf_hub_download(repo_id, first_shard, cache_dir, false);
   }
 
