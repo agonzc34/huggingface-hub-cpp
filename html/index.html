@@ -120,7 +120,7 @@ Prerequisites</h2>
 <li>libcurl (Required for handling downloads)</li>
 </ul>
 <p>On Debian-based systems, you can install libcurl using:</p>
-<div class="fragment"><div class="line">sudo apt-get install libcurl4-openssl-dev</div>
+<div class="fragment"><div class="line">sudo apt-get install libcurl4-openssl-dev libssl-dev</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md4"></a>
 Build</h2>
 <p>To build the project, follow these steps:</p>
@@ -147,7 +147,7 @@ Integrating the library</h2>
 <div class="line">  }</div>
 <div class="line">}</div>
 <div class="ttc" id="ahuggingface__hub_8h_html"><div class="ttname"><a href="huggingface__hub_8h.html">huggingface_hub.h</a></div><div class="ttdoc">Header file for Hugging Face Hub C++ API.</div></div>
-<div class="ttc" id="ahuggingface__hub_8h_html_a3d91c7ee924102d19f369f1a1f305aa9"><div class="ttname"><a href="huggingface__hub_8h.html#a3d91c7ee924102d19f369f1a1f305aa9">huggingface_hub::hf_hub_download</a></div><div class="ttdeci">struct DownloadResult hf_hub_download(const std::string &amp;repo_id, const std::string &amp;filename, const std::string &amp;cache_dir=&quot;~/.cache/huggingface/hub&quot;, bool force_download=false, bool verbose=false)</div><div class="ttdoc">Download a file from Hugging Face Hub.</div><div class="ttdef"><b>Definition</b> huggingface_hub.cpp:327</div></div>
+<div class="ttc" id="ahuggingface__hub_8h_html_a3d91c7ee924102d19f369f1a1f305aa9"><div class="ttname"><a href="huggingface__hub_8h.html#a3d91c7ee924102d19f369f1a1f305aa9">huggingface_hub::hf_hub_download</a></div><div class="ttdeci">struct DownloadResult hf_hub_download(const std::string &amp;repo_id, const std::string &amp;filename, const std::string &amp;cache_dir=&quot;~/.cache/huggingface/hub&quot;, bool force_download=false, bool verbose=false)</div><div class="ttdoc">Download a file from Hugging Face Hub.</div><div class="ttdef"><b>Definition</b> huggingface_hub.cpp:323</div></div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md7"></a>
 Running the demo app</h2>
 <p>A demo application is included to showcase the library in action. To build and run the demo:</p>
