@@ -32,6 +32,7 @@
 #ifndef HUGGINGFACE_HUB_H
 #define HUGGINGFACE_HUB_H
 
+#include <curl/curl.h>
 #include <stdint.h>
 #include <string>
 #include <variant>
@@ -72,9 +73,9 @@ struct DownloadResult {
  * @param repo The repository name or ID.
  * @param file The file name within the repository.
  * @return A variant containing either the FileMetadata structure or an error
- * message string.
+ * code.
  */
-std::variant<struct FileMetadata, std::string>
+std::variant<struct FileMetadata, CURLcode>
 get_model_metadata_from_hf(const std::string &repo, const std::string &file);
 
 /**

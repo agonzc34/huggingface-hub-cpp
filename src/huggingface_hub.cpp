@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <algorithm>
 #include <chrono>
 #include <csignal>
 #include <filesystem>
@@ -30,7 +29,6 @@
 #include <regex>
 #include <sstream>
 
-#include <curl/curl.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -173,11 +171,11 @@ FileMetadata extract_metadata(const std::string &json) {
   return metadata;
 }
 
-std::variant<struct FileMetadata, std::string>
+std::variant<struct FileMetadata, CURLcode>
 get_model_metadata_from_hf(const std::string &repo, const std::string &file) {
   CURL *curl = curl_easy_init();
   if (!curl) {
-    return "Failed to initialize CURL";
+    return CURLE_FAILED_INIT;
   }
 
   std::string response, headers;
@@ -204,7 +202,7 @@ get_model_metadata_from_hf(const std::string &repo, const std::string &file) {
   curl_easy_cleanup(curl);
 
   if (res != CURLE_OK) {
-    return "CURL request failed: " + std::string(curl_easy_strerror(res));
+    return res;
   }
 
   return extract_metadata(response);
@@ -332,8 +330,38 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
 
   // 1. Check that model exists on Hugging Face
   auto metadata_result = get_model_metadata_from_hf(repo_id, filename);
-  if (std::holds_alternative<std::string>(metadata_result)) {
-    log_error(std::get<std::string>(metadata_result));
+  if (std::holds_alternative<CURLcode>(metadata_result)) {
+    CURLcode err = std::get<CURLcode>(metadata_result);
+
+    std::string refs_main_path = "models/" + repo_id;
+    size_t pos = 0;
+    while ((pos = refs_main_path.find("/", pos)) != std::string::npos) {
+      refs_main_path.replace(pos, 1, "--");
+      pos += 2;
+    }
+
+    std::filesystem::path cache_model_dir =
+        expand_user_home("~/.cache/huggingface/hub/" + refs_main_path + "/");
+    std::filesystem::path refs_file_path = cache_model_dir / "refs/main";
+
+    if (std::filesystem::exists(refs_file_path)) {
+      std::ifstream refs_file(refs_file_path);
+      std::string commit;
+      refs_file >> commit;
+      refs_file.close();
+
+      std::filesystem::path snapshot_file_path =
+          cache_model_dir / "snapshots" / commit / filename;
+      if (std::filesystem::exists(snapshot_file_path)) {
+        log_info("Snapshot file exists. Skipping download...");
+        result.success = true;
+        result.path = snapshot_file_path;
+        return result;
+      }
+    }
+
+    log_error("CURL metadata request failed: " +
+              std::string(curl_easy_strerror(err)));
     result.success = false;
     return result;
   }
