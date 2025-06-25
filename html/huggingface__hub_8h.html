@@ -97,7 +97,8 @@ $(function(){ initResizable(false); });
 
 <p>Header file for Hugging Face Hub C++ API.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;curl/curl.h&gt;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;variant&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -105,13 +106,15 @@ Include dependency graph for huggingface_hub.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="huggingface__hub_8h__incl.png" border="0" usemap="#ainclude_2huggingface__hub_8h" alt=""/></div>
 <map name="ainclude_2huggingface__hub_8h" id="ainclude_2huggingface__hub_8h">
-<area shape="rect" title="Header file for Hugging Face Hub C++ API." alt="" coords="52,5,188,46"/>
-<area shape="rect" title=" " alt="" coords="5,94,69,120"/>
-<area shape="poly" title=" " alt="" coords="101,48,63,85,59,81,97,44"/>
-<area shape="rect" title=" " alt="" coords="93,94,146,120"/>
-<area shape="poly" title=" " alt="" coords="122,46,122,78,117,78,117,46"/>
-<area shape="rect" title=" " alt="" coords="171,94,231,120"/>
-<area shape="poly" title=" " alt="" coords="142,44,179,81,176,85,138,48"/>
+<area shape="rect" title="Header file for Hugging Face Hub C++ API." alt="" coords="112,5,248,46"/>
+<area shape="rect" title=" " alt="" coords="5,94,83,120"/>
+<area shape="poly" title=" " alt="" coords="147,49,79,88,76,84,145,44"/>
+<area shape="rect" title=" " alt="" coords="107,94,170,120"/>
+<area shape="poly" title=" " alt="" coords="172,48,154,81,150,79,167,45"/>
+<area shape="rect" title=" " alt="" coords="195,94,248,120"/>
+<area shape="poly" title=" " alt="" coords="193,45,210,79,206,81,188,48"/>
+<area shape="rect" title=" " alt="" coords="272,94,333,120"/>
+<area shape="poly" title=" " alt="" coords="212,44,273,83,270,88,209,49"/>
 </map>
 </div>
 </div>
@@ -128,9 +131,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa34e943029e0aff3b708b6801c108953" id="r_aa34e943029e0aff3b708b6801c108953"><td class="memItemLeft" align="right" valign="top">std::variant&lt; struct <a class="el" href="structhuggingface__hub_1_1FileMetadata.html">FileMetadata</a>, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa34e943029e0aff3b708b6801c108953">huggingface_hub::get_model_metadata_from_hf</a> (const std::string &amp;repo, const std::string &amp;file)</td></tr>
-<tr class="memdesc:aa34e943029e0aff3b708b6801c108953"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get metadata of a model file from Hugging Face Hub.  <br /></td></tr>
-<tr class="separator:aa34e943029e0aff3b708b6801c108953"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a074111684a60359c5b9539a74b410125" id="r_a074111684a60359c5b9539a74b410125"><td class="memItemLeft" align="right" valign="top">std::variant&lt; struct <a class="el" href="structhuggingface__hub_1_1FileMetadata.html">FileMetadata</a>, CURLcode &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a074111684a60359c5b9539a74b410125">huggingface_hub::get_model_metadata_from_hf</a> (const std::string &amp;repo, const std::string &amp;file)</td></tr>
+<tr class="memdesc:a074111684a60359c5b9539a74b410125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get metadata of a model file from Hugging Face Hub.  <br /></td></tr>
+<tr class="separator:a074111684a60359c5b9539a74b410125"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d91c7ee924102d19f369f1a1f305aa9" id="r_a3d91c7ee924102d19f369f1a1f305aa9"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structhuggingface__hub_1_1DownloadResult.html">DownloadResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3d91c7ee924102d19f369f1a1f305aa9">huggingface_hub::hf_hub_download</a> (const std::string &amp;repo_id, const std::string &amp;filename, const std::string &amp;cache_dir=&quot;~/.cache/huggingface/hub&quot;, bool force_download=false, bool verbose=false)</td></tr>
 <tr class="memdesc:a3d91c7ee924102d19f369f1a1f305aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Download a file from Hugging Face Hub.  <br /></td></tr>
 <tr class="separator:a3d91c7ee924102d19f369f1a1f305aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,14 +145,14 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Header file for Hugging Face Hub C++ API. </p>
 <p>This file contains the declarations of the structures and functions used to interact with the Hugging Face Hub. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aa34e943029e0aff3b708b6801c108953" name="aa34e943029e0aff3b708b6801c108953"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa34e943029e0aff3b708b6801c108953">&#9670;&#160;</a></span>get_model_metadata_from_hf()</h2>
+<a id="a074111684a60359c5b9539a74b410125" name="a074111684a60359c5b9539a74b410125"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a074111684a60359c5b9539a74b410125">&#9670;&#160;</a></span>get_model_metadata_from_hf()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::variant&lt; struct FileMetadata, std::string &gt; huggingface_hub::get_model_metadata_from_hf </td>
+          <td class="memname">std::variant&lt; struct FileMetadata, CURLcode &gt; huggingface_hub::get_model_metadata_from_hf </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>repo</em></span>, </td>
         </tr>
@@ -170,7 +173,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A variant containing either the FileMetadata structure or an error message string. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A variant containing either the FileMetadata structure or an error code. </dd></dl>
 
 </div>
 </div>

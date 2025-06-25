@@ -29,38 +29,39 @@
 \DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifndef\ HUGGINGFACE\_HUB\_H}}
 \DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ HUGGINGFACE\_HUB\_H}}
 \DoxyCodeLine{00034\ }
-\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
-\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <string>}}
-\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <variant>}}
-\DoxyCodeLine{00038\ }
-\DoxyCodeLine{00039\ \textcolor{keyword}{namespace\ }huggingface\_hub\ \{}
-\DoxyCodeLine{00046\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata}{FileMetadata}}\ \{}
-\DoxyCodeLine{00047\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a22d15e8283b88cf7ba2f4f60a2524f97}{commit}};\ }
-\DoxyCodeLine{00048\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_ad1d0fff82fe8c3f2c0dd98ada54b8f9b}{type}};\ \ \ }
-\DoxyCodeLine{00049\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_af370a5aa1b1126e5d6b92a7ebbe2ac38}{oid}};\ \ \ \ }
-\DoxyCodeLine{00050\ \ \ uint64\_t\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a18dac81998e7a3bbfca056f8b2a94c91}{size}};\ \ \ \ \ \ }
-\DoxyCodeLine{00051\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a8bbce1e5952c9affbb4031943b75a10a}{sha256}};\ }
-\DoxyCodeLine{00052\ \};}
-\DoxyCodeLine{00053\ }
-\DoxyCodeLine{00061\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}\ \{}
-\DoxyCodeLine{00062\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult_ada5de79cc0c19aab4edc7c7fafdef60b}{success}};\ \ \ \ \ }
-\DoxyCodeLine{00063\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult_aabc672c9999b34626802cedc1dcc96d1}{path}};\ }
-\DoxyCodeLine{00064\ \};}
-\DoxyCodeLine{00065\ }
-\DoxyCodeLine{00077\ std::variant<struct\ FileMetadata,\ std::string>}
-\DoxyCodeLine{00078\ \mbox{\hyperlink{huggingface__hub_8h_aa34e943029e0aff3b708b6801c108953}{get\_model\_metadata\_from\_hf}}(\textcolor{keyword}{const}\ std::string\ \&repo,\ \textcolor{keyword}{const}\ std::string\ \&file);}
-\DoxyCodeLine{00079\ }
-\DoxyCodeLine{00095\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}}
-\DoxyCodeLine{00096\ \mbox{\hyperlink{huggingface__hub_8h_a3d91c7ee924102d19f369f1a1f305aa9}{hf\_hub\_download}}(const\ std::string\ \&repo\_id,\ const\ std::string\ \&filename,}
-\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ std::string\ \&cache\_dir\ =\ "{}\string~/.cache/huggingface/hub"{},}
-\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bool\ force\_download\ =\ false,\ bool\ verbose\ =\ false);}
-\DoxyCodeLine{00099\ }
-\DoxyCodeLine{00115\ struct\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}\ \mbox{\hyperlink{huggingface__hub_8h_a3d36f787415e7ea30d63b9f537316fea}{hf\_hub\_download\_with\_shards}}(}
-\DoxyCodeLine{00116\ \ \ \ \ const\ std::string\ \&repo\_id,\ const\ std::string\ \&filename,}
-\DoxyCodeLine{00117\ \ \ \ \ const\ std::string\ \&cache\_dir\ =\ "{}\string~/.cache/huggingface/hub"{},}
-\DoxyCodeLine{00118\ \ \ \ \ bool\ force\_download\ =\ false);}
-\DoxyCodeLine{00119\ }
-\DoxyCodeLine{00120\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ HUGGINGFACE\_HUB\_H}}
-\DoxyCodeLine{00121\ \}\ \textcolor{comment}{//\ namespace\ huggingface\_hub}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ <curl/curl.h>}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ <variant>}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{keyword}{namespace\ }huggingface\_hub\ \{}
+\DoxyCodeLine{00047\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata}{FileMetadata}}\ \{}
+\DoxyCodeLine{00048\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a22d15e8283b88cf7ba2f4f60a2524f97}{commit}};\ }
+\DoxyCodeLine{00049\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_ad1d0fff82fe8c3f2c0dd98ada54b8f9b}{type}};\ \ \ }
+\DoxyCodeLine{00050\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_af370a5aa1b1126e5d6b92a7ebbe2ac38}{oid}};\ \ \ \ }
+\DoxyCodeLine{00051\ \ \ uint64\_t\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a18dac81998e7a3bbfca056f8b2a94c91}{size}};\ \ \ \ \ \ }
+\DoxyCodeLine{00052\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata_a8bbce1e5952c9affbb4031943b75a10a}{sha256}};\ }
+\DoxyCodeLine{00053\ \};}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00062\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}\ \{}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult_ada5de79cc0c19aab4edc7c7fafdef60b}{success}};\ \ \ \ \ }
+\DoxyCodeLine{00064\ \ \ std::string\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult_aabc672c9999b34626802cedc1dcc96d1}{path}};\ }
+\DoxyCodeLine{00065\ \};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00078\ std::variant<struct\ FileMetadata,\ CURLcode>}
+\DoxyCodeLine{00079\ \mbox{\hyperlink{huggingface__hub_8h_a074111684a60359c5b9539a74b410125}{get\_model\_metadata\_from\_hf}}(\textcolor{keyword}{const}\ std::string\ \&repo,\ \textcolor{keyword}{const}\ std::string\ \&file);}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00096\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}}
+\DoxyCodeLine{00097\ \mbox{\hyperlink{huggingface__hub_8h_a3d91c7ee924102d19f369f1a1f305aa9}{hf\_hub\_download}}(const\ std::string\ \&repo\_id,\ const\ std::string\ \&filename,}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ std::string\ \&cache\_dir\ =\ "{}\string~/.cache/huggingface/hub"{},}
+\DoxyCodeLine{00099\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ bool\ force\_download\ =\ false,\ bool\ verbose\ =\ false);}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00116\ struct\ \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{DownloadResult}}\ \mbox{\hyperlink{huggingface__hub_8h_a3d36f787415e7ea30d63b9f537316fea}{hf\_hub\_download\_with\_shards}}(}
+\DoxyCodeLine{00117\ \ \ \ \ const\ std::string\ \&repo\_id,\ const\ std::string\ \&filename,}
+\DoxyCodeLine{00118\ \ \ \ \ const\ std::string\ \&cache\_dir\ =\ "{}\string~/.cache/huggingface/hub"{},}
+\DoxyCodeLine{00119\ \ \ \ \ bool\ force\_download\ =\ false);}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ HUGGINGFACE\_HUB\_H}}
+\DoxyCodeLine{00122\ \}\ \textcolor{comment}{//\ namespace\ huggingface\_hub}}
 
 \end{DoxyCode}

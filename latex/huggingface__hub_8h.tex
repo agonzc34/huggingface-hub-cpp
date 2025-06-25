@@ -5,6 +5,7 @@
 Header file for Hugging Face Hub C++ API.  
 
 
+{\ttfamily \#include $<$curl/curl.\+h$>$}\newline
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
 {\ttfamily \#include $<$string$>$}\newline
 {\ttfamily \#include $<$variant$>$}\newline
@@ -13,7 +14,7 @@ Include dependency graph for huggingface\+\_\+hub.\+h\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=249pt]{huggingface__hub_8h__incl}
+\includegraphics[width=326pt]{huggingface__hub_8h__incl}
 \end{center}
 \end{figure}
 \doxysubsubsection*{Classes}
@@ -26,7 +27,7 @@ struct \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{huggingface\+\
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-std\+::variant$<$ struct \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata}{File\+Metadata}}, std\+::string $>$ \mbox{\hyperlink{huggingface__hub_8h_aa34e943029e0aff3b708b6801c108953}{huggingface\+\_\+hub\+::get\+\_\+model\+\_\+metadata\+\_\+from\+\_\+hf}} (const std\+::string \&repo, const std\+::string \&file)
+std\+::variant$<$ struct \mbox{\hyperlink{structhuggingface__hub_1_1FileMetadata}{File\+Metadata}}, CURLcode $>$ \mbox{\hyperlink{huggingface__hub_8h_a074111684a60359c5b9539a74b410125}{huggingface\+\_\+hub\+::get\+\_\+model\+\_\+metadata\+\_\+from\+\_\+hf}} (const std\+::string \&repo, const std\+::string \&file)
 \begin{DoxyCompactList}\small\item\em Get metadata of a model file from Hugging Face Hub. \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{structhuggingface__hub_1_1DownloadResult}{Download\+Result}} \mbox{\hyperlink{huggingface__hub_8h_a3d91c7ee924102d19f369f1a1f305aa9}{huggingface\+\_\+hub\+::hf\+\_\+hub\+\_\+download}} (const std\+::string \&repo\+\_\+id, const std\+::string \&filename, const std\+::string \&cache\+\_\+dir="{}\texorpdfstring{$\sim$}{\string~}/.cache/huggingface/hub"{}, bool force\+\_\+download=false, bool verbose=false)
 \begin{DoxyCompactList}\small\item\em Download a file from Hugging Face Hub. \end{DoxyCompactList}\item 
@@ -40,11 +41,11 @@ Header file for Hugging Face Hub C++ API.
 This file contains the declarations of the structures and functions used to interact with the Hugging Face Hub. 
 
 \doxysubsection{Function Documentation}
-\Hypertarget{huggingface__hub_8h_aa34e943029e0aff3b708b6801c108953}\index{huggingface\_hub.h@{huggingface\_hub.h}!get\_model\_metadata\_from\_hf@{get\_model\_metadata\_from\_hf}}
+\Hypertarget{huggingface__hub_8h_a074111684a60359c5b9539a74b410125}\index{huggingface\_hub.h@{huggingface\_hub.h}!get\_model\_metadata\_from\_hf@{get\_model\_metadata\_from\_hf}}
 \index{get\_model\_metadata\_from\_hf@{get\_model\_metadata\_from\_hf}!huggingface\_hub.h@{huggingface\_hub.h}}
 \doxysubsubsection{\texorpdfstring{get\_model\_metadata\_from\_hf()}{get\_model\_metadata\_from\_hf()}}
-{\footnotesize\ttfamily \label{huggingface__hub_8h_aa34e943029e0aff3b708b6801c108953} 
-std\+::variant$<$ struct File\+Metadata, std\+::string $>$ huggingface\+\_\+hub\+::get\+\_\+model\+\_\+metadata\+\_\+from\+\_\+hf (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{repo}{, }\item[{const std\+::string \&}]{file}{}\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \label{huggingface__hub_8h_a074111684a60359c5b9539a74b410125} 
+std\+::variant$<$ struct File\+Metadata, CURLcode $>$ huggingface\+\_\+hub\+::get\+\_\+model\+\_\+metadata\+\_\+from\+\_\+hf (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{repo}{, }\item[{const std\+::string \&}]{file}{}\end{DoxyParamCaption})}
 
 
 
@@ -60,7 +61,7 @@ This function retrieves the metadata of a specified file from a given repository
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-A variant containing either the File\+Metadata structure or an error message string. 
+A variant containing either the File\+Metadata structure or an error code. 
 \end{DoxyReturn}
 \Hypertarget{huggingface__hub_8h_a3d91c7ee924102d19f369f1a1f305aa9}\index{huggingface\_hub.h@{huggingface\_hub.h}!hf\_hub\_download@{hf\_hub\_download}}
 \index{hf\_hub\_download@{hf\_hub\_download}!huggingface\_hub.h@{huggingface\_hub.h}}

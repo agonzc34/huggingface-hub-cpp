@@ -1,9 +1,11 @@
 <map id="include/huggingface_hub.h" name="include/huggingface_hub.h">
-<area shape="rect" id="Node000001" title="Header file for Hugging Face Hub C++ API." alt="" coords="52,5,188,46"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,69,120"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,48,63,85,59,81,97,44"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="93,94,146,120"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="122,46,122,78,117,78,117,46"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="171,94,231,120"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="142,44,179,81,176,85,138,48"/>
+<area shape="rect" id="Node000001" title="Header file for Hugging Face Hub C++ API." alt="" coords="112,5,248,46"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,94,83,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,49,79,88,76,84,145,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="107,94,170,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,48,154,81,150,79,167,45"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="195,94,248,120"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="193,45,210,79,206,81,188,48"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="272,94,333,120"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="212,44,273,83,270,88,209,49"/>
 </map>
