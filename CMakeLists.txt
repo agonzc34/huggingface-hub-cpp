@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(HFHub CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Find CURL package
 find_package(CURL REQUIRED)
 
