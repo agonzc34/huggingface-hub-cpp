@@ -112,7 +112,7 @@ std::string create_cache_system(const std::string &cache_dir,
 
 size_t write_string_data(void *ptr, size_t size, size_t nmemb, void *stream) {
   if (!stream) {
-    log_error("Error: stream is null!");
+    log_error("Stream is null!");
     return 0;
   }
   std::string *out = static_cast<std::string *>(stream);
@@ -122,12 +122,12 @@ size_t write_string_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 
 size_t write_file_data(void *ptr, size_t size, size_t nmemb, void *stream) {
   if (!stream) {
-    log_error("Error: stream is null!");
+    log_error("Stream is null!");
     return 0;
   }
   std::ofstream *out = static_cast<std::ofstream *>(stream);
   if (!out->is_open()) {
-    log_error("Error: output file stream is not open!");
+    log_error("Output file stream is not open!");
     return 0;
   }
   out->write(static_cast<char *>(ptr), size * nmemb);
@@ -161,14 +161,72 @@ FileMetadata extract_metadata(const std::string &json) {
               R"(\"lfs\"\s*:\s*\{[^}]*\"oid\"\s*:\s*\"([a-f0-9]{64})\")")))
     metadata.sha256 = match[1];
 
-  // Extract "commit" ID
-  if (std::regex_search(
-          json, match,
-          std::regex(
-              R"(\"lastCommit\"\s*:\s*\{[^}]*\"id\"\s*:\s*\"([a-f0-9]{40})\")")))
-    metadata.commit = match[1];
-
   return metadata;
+}
+
+std::string get_file_path(const std::string &cache_dir,
+                          const std::string &repo_id, const std::string &file) {
+  std::string model_folder = "models/" + repo_id;
+
+  size_t pos = 0;
+  while ((pos = model_folder.find("/", pos)) != std::string::npos) {
+    model_folder.replace(pos, 1, "--");
+    pos += 2;
+  }
+
+  std::filesystem::path expanded_cache_dir = expand_user_home(cache_dir);
+  std::filesystem::path refs_file_path =
+      expanded_cache_dir / model_folder / "refs" / "main";
+
+  if (!std::filesystem::exists(refs_file_path)) {
+    log_info("refs file does not exist");
+    return "";
+  }
+  std::ifstream refs_file(refs_file_path);
+  std::string commit;
+  refs_file >> commit;
+  refs_file.close();
+  std::filesystem::path snapshot_file_path =
+      expanded_cache_dir / model_folder / "snapshots" / commit / file;
+  if (std::filesystem::exists(snapshot_file_path)) {
+    return snapshot_file_path.string();
+  } else {
+    return ""; // File does not exist
+  }
+}
+
+std::variant<std::string, CURLcode> get_model_commit(const std::string &repo) {
+  CURL *curl = curl_easy_init();
+  if (!curl) {
+    return CURLE_FAILED_INIT;
+  }
+
+  std::string url =
+      "https://huggingface.co/api/models/" + repo + "/revision/main";
+  std::string response;
+
+  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, NULL);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_string_data);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+  curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+  curl_easy_setopt(curl, CURLOPT_HEADER, 0L);
+
+  CURLcode res = curl_easy_perform(curl);
+  curl_easy_cleanup(curl);
+  if (res != CURLE_OK) {
+    return res;
+  }
+
+  std::smatch match;
+  std::regex pattern("\"sha\"\\s*:\\s*\"([a-fA-F0-9]{40})\"");
+
+  if (std::regex_search(response, match, pattern) && match.size() > 1) {
+    return match[1];
+  } else {
+    return std::string(); // Return empty string if not found
+  }
 }
 
 std::variant<struct FileMetadata, CURLcode>
@@ -203,6 +261,10 @@ get_model_metadata_from_hf(const std::string &repo, const std::string &file) {
 
   if (res != CURLE_OK) {
     return res;
+  }
+
+  if (response.empty() || response == "[]") {
+    return CURLE_REMOTE_FILE_NOT_FOUND;
   }
 
   return extract_metadata(response);
@@ -287,7 +349,6 @@ CURLcode perform_download(std::string url,
                      std::ios::binary | std::ios::app);
 
   if (!file.is_open()) {
-    log_error("Error: failed to open file stream!");
     return CURLE_FAILED_INIT;
   }
 
@@ -328,51 +389,65 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   struct DownloadResult result;
   result.success = true;
 
-  // 1. Check that model exists on Hugging Face
-  auto metadata_result = get_model_metadata_from_hf(repo_id, filename);
-  if (std::holds_alternative<CURLcode>(metadata_result)) {
-    CURLcode err = std::get<CURLcode>(metadata_result);
+  log_info("Downloading " + filename + " from " + repo_id);
 
-    std::string refs_main_path = "models/" + repo_id;
-    size_t pos = 0;
-    while ((pos = refs_main_path.find("/", pos)) != std::string::npos) {
-      refs_main_path.replace(pos, 1, "--");
-      pos += 2;
-    }
+  // Check repo (accessibility and version)
+  auto commit_result = get_model_commit(repo_id);
 
-    std::filesystem::path cache_model_dir =
-        expand_user_home("~/.cache/huggingface/hub/" + refs_main_path + "/");
-    std::filesystem::path refs_file_path = cache_model_dir / "refs/main";
+  if (std::holds_alternative<CURLcode>(commit_result)) {
+    CURLcode err = std::get<CURLcode>(commit_result);
 
-    if (std::filesystem::exists(refs_file_path)) {
-      std::ifstream refs_file(refs_file_path);
-      std::string commit;
-      refs_file >> commit;
-      refs_file.close();
-
-      std::filesystem::path snapshot_file_path =
-          cache_model_dir / "snapshots" / commit / filename;
-      if (std::filesystem::exists(snapshot_file_path)) {
-        log_info("Snapshot file exists. Skipping download...");
+    if (err == CURLE_COULDNT_RESOLVE_HOST ||
+        err == CURLE_COULDNT_CONNECT) { // OFFLINE MODE
+      std::string file_path = get_file_path(cache_dir, repo_id, filename);
+      if (!file_path.empty()) {
+        log_info("No connection. Using cached file.");
+        result.path = file_path;
         result.success = true;
-        result.path = snapshot_file_path;
+        return result;
+      } else {
+        log_error("Could not resolve host or connect to Hugging Face. "
+                  "Please check your internet connection.");
+        result.success = false;
         return result;
       }
-    }
 
-    log_error("CURL metadata request failed: " +
+    } else if (err == CURLE_HTTP_RETURNED_ERROR) { // REPOSITORY NOT FOUND
+      log_error("Repository not found: " + repo_id);
+      result.success = false;
+      return result;
+    } else {
+      log_error("Error getting model: " + std::string(curl_easy_strerror(err)));
+      result.success = false;
+      return result;
+    }
+  }
+
+  std::string latest_commit = std::get<std::string>(commit_result);
+  if (latest_commit.empty()) {
+    log_error("Failed to retrieve the latest commit for repository: " +
+              repo_id);
+    result.success = false;
+    return result;
+  }
+
+  // Check file accessibility
+  auto metadata_result = get_model_metadata_from_hf(repo_id, filename);
+
+  if (std::holds_alternative<CURLcode>(metadata_result)) {
+    CURLcode err = std::get<CURLcode>(metadata_result);
+    log_error("Error getting metadata: " +
               std::string(curl_easy_strerror(err)));
     result.success = false;
     return result;
   }
 
-  // 2. Create Cache Dir Struct
+  // Create Cache Dir Struct
   std::string cache_model_dir = create_cache_system(cache_dir, repo_id);
   log_debug("Cache directory: " + cache_model_dir);
-  log_info("Downloading " + filename + " from " + repo_id);
 
   struct FileMetadata metadata = std::get<struct FileMetadata>(metadata_result);
-  log_debug("Commit: " + metadata.commit);
+  log_debug("Commit: " + latest_commit);
   log_debug("Blob ID: " + metadata.oid);
   log_debug("Size: " + std::to_string(metadata.size) + " bytes");
   log_debug("SHA256: " + metadata.sha256);
@@ -391,10 +466,14 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   }
 
   std::filesystem::path snapshot_file_path(cache_model_dir + "snapshots/" +
-                                           metadata.commit + "/" + filename);
+                                           latest_commit + "/" + filename);
   std::filesystem::path refs_file_path(cache_model_dir + "refs/main");
 
   result.path = snapshot_file_path;
+
+  std::ofstream refs_file(refs_file_path);
+  refs_file << latest_commit << std::endl;
+  refs_file.close();
 
   if (std::filesystem::exists(snapshot_file_path) &&
       std::filesystem::exists(blob_file_path) && !force_download) {
@@ -402,18 +481,7 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
     return result;
   }
 
-  if (std::filesystem::exists(refs_file_path)) {
-    std::ifstream refs_file(refs_file_path);
-    std::string commit;
-    refs_file >> commit;
-    refs_file.close();
-  } else {
-    std::ofstream refs_file(refs_file_path);
-    refs_file << metadata.commit;
-    refs_file.close();
-  }
-
-  // 3. Download the file
+  // 4. Download the file
   std::string url =
       "https://huggingface.co/" + repo_id + "/resolve/main/" + filename;
   std::filesystem::create_directories(snapshot_file_path.parent_path());
