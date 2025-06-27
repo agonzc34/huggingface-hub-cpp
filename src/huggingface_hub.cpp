@@ -97,6 +97,21 @@ std::string get_model_repo_path(const std::string &repo_id) {
   return model_folder;
 }
 
+std::string find_outdated_file(const std::string &snapshot_dir,
+                               const std::string &filename) {
+  for (const auto &version :
+       std::filesystem::directory_iterator(snapshot_dir)) {
+    for (const auto &file :
+         std::filesystem::directory_iterator(version.path())) {
+      if (file.path().filename() == filename) {
+        return file.path();
+        break;
+      }
+    }
+  }
+  return "";
+}
+
 std::string create_cache_system(const std::string &cache_dir,
                                 const std::string &repo_id) {
   std::string model_folder = get_model_repo_path(repo_id);
@@ -179,7 +194,7 @@ std::string get_file_path(const std::string &cache_dir,
       expanded_cache_dir / model_folder / "refs" / "main";
 
   if (!std::filesystem::exists(refs_file_path)) {
-    log_info("refs file does not exist");
+    log_debug("refs file does not exist");
     return "";
   }
   std::ifstream refs_file(refs_file_path);
@@ -397,51 +412,35 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   if (std::holds_alternative<CURLcode>(commit_result)) {
     CURLcode err = std::get<CURLcode>(commit_result);
 
-    if (err == CURLE_COULDNT_RESOLVE_HOST ||
-        err == CURLE_COULDNT_CONNECT) { // OFFLINE MODE
-      std::string file_path = get_file_path(cache_dir, repo_id, filename);
-      if (!file_path.empty()) {
-        log_info("No connection. Using cached file.");
-        result.path = file_path;
-        result.success = true;
-        return result;
-      } else {
-        std::string model_path = get_model_repo_path(repo_id);
-        bool file_found = false;
-        for (const auto &version : std::filesystem::directory_iterator(
-                 expand_user_home(cache_dir + "/" + model_path + "/snapshots"))) {
-          for (const auto &file :
-               std::filesystem::directory_iterator(version.path())) {
-            if (file.path().filename() == filename) {
-              result.path = file.path();
-              file_found = true;
-              break;
-            }
-          }
-          if (file_found) {
-            break;
-          }
-        }
-        if (file_found) {
-          log_info("No connection. Using outdated cached file: " + result.path);
-          result.success = true;
-          return result;
-        }
-
-        log_error("Could not resolve host or connect to Hugging Face. "
-                  "Please check your internet connection.");
-        result.success = false;
-        return result;
-      }
-    } else if (err == CURLE_HTTP_RETURNED_ERROR) { // REPOSITORY NOT FOUND
-      log_error("Repository not found: " + repo_id);
-      result.success = false;
+    std::string file_path = get_file_path(cache_dir, repo_id, filename);
+    if (!file_path.empty()) {
+      log_info("Using cached file.");
+      result.path = file_path;
+      result.success = true;
       return result;
-    } else {
-      log_error("Error getting model: " + std::string(curl_easy_strerror(err)));
+    }
+
+    std::string model_path = get_model_repo_path(repo_id);
+    std::string snapshot_path =
+        expand_user_home(cache_dir + "/" + model_path + "/snapshots");
+    if (!std::filesystem::exists(snapshot_path)) {
+      log_info(snapshot_path);
+      log_error("Repo not found (locally nor online): " + repo_id);
       result.success = false;
       return result;
     }
+
+    std::string outdated_file = find_outdated_file(snapshot_path, filename);
+    if (!outdated_file.empty()) {
+      log_info("Using outdated cached file " + outdated_file);
+      result.path = outdated_file;
+      result.success = true;
+      return result;
+    }
+
+    log_error("Error getting model: " + std::string(curl_easy_strerror(err)));
+    result.success = false;
+    return result;
   }
 
   std::string latest_commit = std::get<std::string>(commit_result);
