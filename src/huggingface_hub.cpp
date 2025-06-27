@@ -85,15 +85,21 @@ std::filesystem::path expand_user_home(const std::string &path) {
   return std::filesystem::path(path);
 }
 
-std::string create_cache_system(const std::string &cache_dir,
-                                const std::string &repo_id) {
-  std::string model_folder = std::string("models/" + repo_id);
+std::string get_model_repo_path(const std::string &repo_id) {
+  std::string model_folder = "models/" + repo_id;
 
   size_t pos = 0;
   while ((pos = model_folder.find("/", pos)) != std::string::npos) {
     model_folder.replace(pos, 1, "--");
     pos += 2;
   }
+
+  return model_folder;
+}
+
+std::string create_cache_system(const std::string &cache_dir,
+                                const std::string &repo_id) {
+  std::string model_folder = get_model_repo_path(repo_id);
 
   std::string expanded_cache_dir = expand_user_home(cache_dir);
 
@@ -166,13 +172,7 @@ FileMetadata extract_metadata(const std::string &json) {
 
 std::string get_file_path(const std::string &cache_dir,
                           const std::string &repo_id, const std::string &file) {
-  std::string model_folder = "models/" + repo_id;
-
-  size_t pos = 0;
-  while ((pos = model_folder.find("/", pos)) != std::string::npos) {
-    model_folder.replace(pos, 1, "--");
-    pos += 2;
-  }
+  std::string model_folder = get_model_repo_path(repo_id);
 
   std::filesystem::path expanded_cache_dir = expand_user_home(cache_dir);
   std::filesystem::path refs_file_path =
@@ -406,12 +406,33 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
         result.success = true;
         return result;
       } else {
+        std::string model_path = get_model_repo_path(repo_id);
+        bool file_found = false;
+        for (const auto &version : std::filesystem::directory_iterator(
+                 expand_user_home(cache_dir + "/" + model_path + "/snapshots"))) {
+          for (const auto &file :
+               std::filesystem::directory_iterator(version.path())) {
+            if (file.path().filename() == filename) {
+              result.path = file.path();
+              file_found = true;
+              break;
+            }
+          }
+          if (file_found) {
+            break;
+          }
+        }
+        if (file_found) {
+          log_info("No connection. Using outdated cached file: " + result.path);
+          result.success = true;
+          return result;
+        }
+
         log_error("Could not resolve host or connect to Hugging Face. "
                   "Please check your internet connection.");
         result.success = false;
         return result;
       }
-
     } else if (err == CURLE_HTTP_RETURNED_ERROR) { // REPOSITORY NOT FOUND
       log_error("Repository not found: " + repo_id);
       result.success = false;
@@ -477,7 +498,7 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
 
   if (std::filesystem::exists(snapshot_file_path) &&
       std::filesystem::exists(blob_file_path) && !force_download) {
-    log_info("Snapshot file exists. Skipping download...");
+    log_info("Snapshot file exists. Using cached file.");
     return result;
   }
 
