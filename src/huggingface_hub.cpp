@@ -39,7 +39,59 @@
 namespace huggingface_hub {
 
 volatile sig_atomic_t stop_download = 0;
-void handle_sigint(int) { stop_download = 1; }
+volatile sig_atomic_t has_previous_sigint_handler = 0;
+struct sigaction previous_sigint_action;
+
+void handle_sigint(int signo) {
+  stop_download = 1;
+
+  if (!has_previous_sigint_handler) {
+    return;
+  }
+
+  if ((previous_sigint_action.sa_flags & SA_SIGINFO) != 0) {
+    if (previous_sigint_action.sa_sigaction != nullptr) {
+      previous_sigint_action.sa_sigaction(signo, nullptr, nullptr);
+    }
+    return;
+  }
+
+  if (previous_sigint_action.sa_handler != SIG_IGN &&
+      previous_sigint_action.sa_handler != SIG_DFL &&
+      previous_sigint_action.sa_handler != nullptr &&
+      previous_sigint_action.sa_handler != handle_sigint) {
+    previous_sigint_action.sa_handler(signo);
+  }
+}
+
+class ScopedSigintHandler {
+public:
+  ScopedSigintHandler() : installed_(false) {
+    stop_download = 0;
+
+    struct sigaction action;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = 0;
+    action.sa_handler = handle_sigint;
+
+    if (sigaction(SIGINT, &action, &previous_sigint_action) == 0) {
+      has_previous_sigint_handler = 1;
+      installed_ = true;
+    } else {
+      has_previous_sigint_handler = 0;
+    }
+  }
+
+  ~ScopedSigintHandler() {
+    if (installed_) {
+      sigaction(SIGINT, &previous_sigint_action, nullptr);
+    }
+    has_previous_sigint_handler = 0;
+  }
+
+private:
+  bool installed_;
+};
 
 bool log_verbose = false;
 
@@ -398,7 +450,7 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
                                       const std::string &filename,
                                       const std::string &cache_dir,
                                       bool force_download, bool verbose) {
-  signal(SIGINT, handle_sigint);
+  ScopedSigintHandler scoped_sigint_handler;
   log_verbose = verbose;
 
   struct DownloadResult result;
