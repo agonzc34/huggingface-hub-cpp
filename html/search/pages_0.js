@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['cpp_0',['huggingface-hub-cpp',['../index.html',1,'']]]
+  ['app_0',['Running the demo app',['../index.html#autotoc_md7',1,'']]]
 ];

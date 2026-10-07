@@ -1,14 +1,14 @@
-\chapter{huggingface-\/hub-\/cpp}
+\chapter{huggingface-\/hub-\/cpp }
 \hypertarget{index}{}\label{index}\index{huggingface-\/hub-\/cpp@{huggingface-\/hub-\/cpp}}
 \label{index_md_README}%
 \Hypertarget{index_md_README}%
 
 
-This library is a C++ port of the \href{https://github.com/huggingface/huggingface_hub}{\texttt{ Hugging Face Hub}} that provides an implementation of hf\+\_\+hub\+\_\+download for C++. It enables seamless downloading of models and other assets from the Hugging Face Hub while maintaining full compatibility with its Python counterpart.
+This library is a C++ port of the \href{https://github.com/huggingface/huggingface_hub}{\texttt{Hugging Face Hub}} that provides an implementation of hf\+\_\+hub\+\_\+download for C++. It enables seamless downloading of models and other assets from the Hugging Face Hub while maintaining full compatibility with its Python counterpart.
 
 With this library, C++ developers can integrate Hugging Face model downloads directly into their applications, ensuring efficient and reliable access to AI resources without requiring Python dependencies.
 
-\href{https://opensource.org/license/mit}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp/releases}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp?branch=main}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp/commits/main}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp/issues}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp/pulls}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp/graphs/contributors}{\texttt{ }} \href{https://github.com/agonzc34/huggingface-hub-cpp/actions/workflows/cmake-build-status.yml?branch=main}{\texttt{ }} \href{https://agonzc34.github.io/huggingface-hub-cpp/}{\texttt{ }}\hypertarget{index_autotoc_md1}{}\doxysection{\texorpdfstring{Table of Contents}{Table of Contents}}\label{index_autotoc_md1}
+\href{https://opensource.org/license/mit}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp/releases}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp?branch=main}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp/commits/main}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp/issues}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp/pulls}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp/graphs/contributors}{\texttt{}} \href{https://github.com/agonzc34/huggingface-hub-cpp/actions/workflows/cmake-build-status.yml?branch=main}{\texttt{}} \href{https://agonzc34.github.io/huggingface-hub-cpp/}{\texttt{}}\hypertarget{index_autotoc_md1}{}\doxysection{\texorpdfstring{Table of Contents}{Table of Contents}}\label{index_autotoc_md1}
 
 \begin{DoxyItemize}
 \item huggingface-\/hub-\/cpp
@@ -28,15 +28,15 @@ With this library, C++ developers can integrate Hugging Face model downloads dir
 \end{DoxyItemize}
 \end{DoxyItemize}\hypertarget{index_autotoc_md2}{}\doxysection{\texorpdfstring{Installation}{Installation}}\label{index_autotoc_md2}
 \hypertarget{index_autotoc_md3}{}\doxysubsection{\texorpdfstring{Prerequisites}{Prerequisites}}\label{index_autotoc_md3}
-Before installing, ensure you have the following dependencies installed\+:
+Before installing, ensure you have the following dependencies installed:
 
 
 \begin{DoxyItemize}
-\item CMake (Minimum version recommended\+: 3.\+x)
+\item CMake (Minimum version recommended: 3.\+x)
 \item libcurl (Required for handling downloads)
 \end{DoxyItemize}
 
-On Debian-\/based systems, you can install libcurl using\+:
+On Debian-\/based systems, you can install libcurl using:
 
 
 \begin{DoxyCode}{0}
@@ -44,7 +44,7 @@ On Debian-\/based systems, you can install libcurl using\+:
 
 \end{DoxyCode}
 \hypertarget{index_autotoc_md4}{}\doxysubsection{\texorpdfstring{Build}{Build}}\label{index_autotoc_md4}
-To build the project, follow these steps\+:
+To build the project, follow these steps:
 
 
 \begin{DoxyCode}{0}
@@ -61,13 +61,13 @@ To use this library in your C++ project, include the necessary headers and call 
 
 
 \begin{DoxyCode}{0}
-\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{huggingface__hub_8h}{huggingface\_hub.h}}"{}}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#include\ "{}\doxymbox{\hyperlink{huggingface__hub_8h}{huggingface\_hub.h}}"{}}}
 \DoxyCodeLine{}
 \DoxyCodeLine{\textcolor{keywordtype}{int}\ main()\ \{}
 \DoxyCodeLine{\ \ std::string\ repo\_id\ =\ \textcolor{stringliteral}{"{}<huggingface-\/repo>"{}};}
 \DoxyCodeLine{\ \ std::string\ filename\ =\ \textcolor{stringliteral}{"{}<file-\/to-\/download>"{}};}
 \DoxyCodeLine{}
-\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (\mbox{\hyperlink{huggingface__hub_8h_a3d91c7ee924102d19f369f1a1f305aa9}{huggingface\_hub::hf\_hub\_download}}(repo\_id,\ filename).success)\ \{}
+\DoxyCodeLine{\ \ \textcolor{keywordflow}{if}\ (\doxymbox{\hyperlink{huggingface__hub_8h_a3d91c7ee924102d19f369f1a1f305aa9}{huggingface\_hub::hf\_hub\_download}}(repo\_id,\ filename).success)\ \{}
 \DoxyCodeLine{\ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Model\ downloaded!"{}}\ <<\ std::endl;}
 \DoxyCodeLine{\ \ \}\ \textcolor{keywordflow}{else}\ \{}
 \DoxyCodeLine{\ \ \ \ std::cout\ <<\ \textcolor{stringliteral}{"{}Error"{}}\ <<\ std::endl;}
@@ -76,7 +76,7 @@ To use this library in your C++ project, include the necessary headers and call 
 
 \end{DoxyCode}
 \hypertarget{index_autotoc_md7}{}\doxysubsection{\texorpdfstring{Running the demo app}{Running the demo app}}\label{index_autotoc_md7}
-A demo application is included to showcase the library in action. To build and run the demo\+:
+A demo application is included to showcase the library in action. To build and run the demo:
 
 
 \begin{DoxyCode}{0}
@@ -86,4 +86,4 @@ A demo application is included to showcase the library in action. To build and r
 
 
 This will execute a sample download for the qwen2.\+5-\/0.\+5b-\/instruct-\/q2\+\_\+k.\+gguf model\hypertarget{index_autotoc_md8}{}\doxysection{\texorpdfstring{License}{License}}\label{index_autotoc_md8}
-This project is licensed under the MIT License. See the \href{./LICENSE}{\texttt{ LICENSE}} file for more details. 
+This project is licensed under the MIT License. See the \href{./LICENSE}{\texttt{LICENSE}} file for more details. 
