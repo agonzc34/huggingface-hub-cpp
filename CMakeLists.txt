@@ -3,8 +3,20 @@ project(HFHub CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# The sources use std::variant and <filesystem>, so C++17 is required.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Find CURL package
 find_package(CURL REQUIRED)
+
+# CURL::libcurl exists only from CMake 3.12 (Ubuntu 18.04 ships 3.10).
+if(TARGET CURL::libcurl)
+  set(HFHUB_CURL CURL::libcurl)
+else()
+  set(HFHUB_CURL ${CURL_LIBRARIES})
+endif()
 
 # Define the hfhub static library and link it to CURL
 add_library(hfhub STATIC src/huggingface_hub.cpp)
@@ -15,7 +27,12 @@ target_include_directories(hfhub PUBLIC
   $<INSTALL_INTERFACE:include>
   ${CURL_INCLUDE_DIRS}
 )
-target_link_libraries(hfhub PUBLIC CURL::libcurl)
+target_link_libraries(hfhub PUBLIC ${HFHUB_CURL})
+
+# <filesystem> lives in a separate libstdc++fs on GCC < 10 (Ubuntu 18.04/20.04).
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+  target_link_libraries(hfhub PUBLIC stdc++fs)
+endif()
 
 # Export target
 install(TARGETS hfhub

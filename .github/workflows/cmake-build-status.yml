@@ -4,21 +4,29 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Ubuntu ${{ matrix.ubuntu }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu: ['18.04', '20.04', '22.04', '24.04', '26.04']
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libcurl4-openssl-dev
-
-      - name: Configure CMake
+      # Build inside the official Ubuntu image so every version is tested for
+      # real (GitHub no longer hosts runners for 18.04/20.04, and 18.04's glibc
+      # is too old for the checkout action's Node runtime).
+      - name: Build and test on Ubuntu ${{ matrix.ubuntu }}
         run: |
-          mkdir -p build
-          cd build
-          cmake ..
-
-      - name: Build project
-        run: |
-          cd build
-          make
+          docker run --rm -v "$PWD":/src -w /src ubuntu:${{ matrix.ubuntu }} \
+            bash -c '
+              set -eux
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+                cmake g++ make libcurl4-openssl-dev ca-certificates
+              # Classic configure form: CMake 3.10 (Ubuntu 18.04) has no -S/-B.
+              mkdir -p build && cd build
+              cmake ..
+              cmake --build . -- -j"$(nproc)"
+            '

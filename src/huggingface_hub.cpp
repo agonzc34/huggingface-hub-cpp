@@ -23,7 +23,14 @@
 
 #include <chrono>
 #include <csignal>
+#if __has_include(<filesystem>)
 #include <filesystem>
+namespace fs = std::filesystem;
+#else
+// GCC 7 (Ubuntu 18.04) only ships the experimental filesystem.
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
 #include <fstream>
 #include <iomanip>
 #include <regex>
@@ -127,14 +134,14 @@ long get_file_size(const std::string &filename) {
   return 0; // File doesn't exist
 }
 
-std::filesystem::path expand_user_home(const std::string &path) {
+fs::path expand_user_home(const std::string &path) {
   if (!path.empty() && path[0] == '~') {
     const char *home = std::getenv("HOME"); // Get HOME environment variable
     if (home) {
-      return std::filesystem::path(home + path.substr(1));
+      return fs::path(home + path.substr(1));
     }
   }
-  return std::filesystem::path(path);
+  return fs::path(path);
 }
 
 std::string get_model_repo_path(const std::string &repo_id) {
@@ -152,9 +159,9 @@ std::string get_model_repo_path(const std::string &repo_id) {
 std::string find_outdated_file(const std::string &snapshot_dir,
                                const std::string &filename) {
   for (const auto &version :
-       std::filesystem::directory_iterator(snapshot_dir)) {
+       fs::directory_iterator(snapshot_dir)) {
     for (const auto &file :
-         std::filesystem::directory_iterator(version.path())) {
+         fs::directory_iterator(version.path())) {
       if (file.path().filename() == filename) {
         return file.path();
         break;
@@ -176,9 +183,9 @@ std::string create_cache_system(const std::string &cache_dir,
   std::string blobs_path = model_cache_path + std::string("blobs");
   std::string snapshots_path = model_cache_path + std::string("snapshots");
 
-  std::filesystem::create_directories(refs_path);
-  std::filesystem::create_directories(blobs_path);
-  std::filesystem::create_directories(snapshots_path);
+  fs::create_directories(refs_path);
+  fs::create_directories(blobs_path);
+  fs::create_directories(snapshots_path);
 
   return model_cache_path;
 }
@@ -241,11 +248,11 @@ std::string get_file_path(const std::string &cache_dir,
                           const std::string &repo_id, const std::string &file) {
   std::string model_folder = get_model_repo_path(repo_id);
 
-  std::filesystem::path expanded_cache_dir = expand_user_home(cache_dir);
-  std::filesystem::path refs_file_path =
+  fs::path expanded_cache_dir = expand_user_home(cache_dir);
+  fs::path refs_file_path =
       expanded_cache_dir / model_folder / "refs" / "main";
 
-  if (!std::filesystem::exists(refs_file_path)) {
+  if (!fs::exists(refs_file_path)) {
     log_debug("refs file does not exist");
     return "";
   }
@@ -253,9 +260,9 @@ std::string get_file_path(const std::string &cache_dir,
   std::string commit;
   refs_file >> commit;
   refs_file.close();
-  std::filesystem::path snapshot_file_path =
+  fs::path snapshot_file_path =
       expanded_cache_dir / model_folder / "snapshots" / commit / file;
-  if (std::filesystem::exists(snapshot_file_path)) {
+  if (fs::exists(snapshot_file_path)) {
     return snapshot_file_path.string();
   } else {
     return ""; // File does not exist
@@ -475,7 +482,7 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
     std::string model_path = get_model_repo_path(repo_id);
     std::string snapshot_path =
         expand_user_home(cache_dir + "/" + model_path + "/snapshots");
-    if (!std::filesystem::exists(snapshot_path)) {
+    if (!fs::exists(snapshot_path)) {
       log_info(snapshot_path);
       log_error("Repo not found (locally nor online): " + repo_id);
       result.success = false;
@@ -524,8 +531,8 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   log_debug("Size: " + std::to_string(metadata.size) + " bytes");
   log_debug("SHA256: " + metadata.sha256);
 
-  std::filesystem::path blob_file_path;
-  std::filesystem::path blob_incomplete_file_path;
+  fs::path blob_file_path;
+  fs::path blob_incomplete_file_path;
 
   if (metadata.sha256.empty()) {
     blob_file_path = cache_model_dir + "blobs/" + metadata.oid;
@@ -537,9 +544,9 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
         cache_model_dir + "blobs/" + metadata.sha256 + ".incomplete";
   }
 
-  std::filesystem::path snapshot_file_path(cache_model_dir + "snapshots/" +
+  fs::path snapshot_file_path(cache_model_dir + "snapshots/" +
                                            latest_commit + "/" + filename);
-  std::filesystem::path refs_file_path(cache_model_dir + "refs/main");
+  fs::path refs_file_path(cache_model_dir + "refs/main");
 
   result.path = snapshot_file_path;
 
@@ -547,8 +554,8 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   refs_file << latest_commit << std::endl;
   refs_file.close();
 
-  if (std::filesystem::exists(snapshot_file_path) &&
-      std::filesystem::exists(blob_file_path) && !force_download) {
+  if (fs::exists(snapshot_file_path) &&
+      fs::exists(blob_file_path) && !force_download) {
     log_info("Snapshot file exists. Using cached file.");
     return result;
   }
@@ -556,9 +563,9 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   // 4. Download the file
   std::string url =
       "https://huggingface.co/" + repo_id + "/resolve/main/" + filename;
-  std::filesystem::create_directories(snapshot_file_path.parent_path());
+  fs::create_directories(snapshot_file_path.parent_path());
 
-  if (!std::filesystem::exists(blob_file_path) || force_download) {
+  if (!fs::exists(blob_file_path) || force_download) {
     CURLcode res = perform_download(url, blob_incomplete_file_path,
                                     force_download, metadata);
     result.success = res == CURLE_OK;
@@ -570,15 +577,15 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
       log_error("CURL request failed: " + std::string(curl_easy_strerror(res)));
       return result;
     } else {
-      std::filesystem::rename(blob_incomplete_file_path, blob_file_path);
+      fs::rename(blob_incomplete_file_path, blob_file_path);
     }
   }
 
-  if (std::filesystem::exists(snapshot_file_path)) {
+  if (fs::exists(snapshot_file_path)) {
     log_debug("Snapshot file exists. Deleting...");
-    std::filesystem::remove(snapshot_file_path);
+    fs::remove(snapshot_file_path);
   }
-  std::filesystem::create_symlink(blob_file_path, snapshot_file_path);
+  fs::create_symlink(blob_file_path, snapshot_file_path);
 
   log_info("Downloaded to: " + snapshot_file_path.string());
 
