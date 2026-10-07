@@ -158,10 +158,8 @@ std::string get_model_repo_path(const std::string &repo_id) {
 
 std::string find_outdated_file(const std::string &snapshot_dir,
                                const std::string &filename) {
-  for (const auto &version :
-       fs::directory_iterator(snapshot_dir)) {
-    for (const auto &file :
-         fs::directory_iterator(version.path())) {
+  for (const auto &version : fs::directory_iterator(snapshot_dir)) {
+    for (const auto &file : fs::directory_iterator(version.path())) {
       if (file.path().filename() == filename) {
         return file.path();
         break;
@@ -249,8 +247,7 @@ std::string get_file_path(const std::string &cache_dir,
   std::string model_folder = get_model_repo_path(repo_id);
 
   fs::path expanded_cache_dir = expand_user_home(cache_dir);
-  fs::path refs_file_path =
-      expanded_cache_dir / model_folder / "refs" / "main";
+  fs::path refs_file_path = expanded_cache_dir / model_folder / "refs" / "main";
 
   if (!fs::exists(refs_file_path)) {
     log_debug("refs file does not exist");
@@ -544,8 +541,8 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
         cache_model_dir + "blobs/" + metadata.sha256 + ".incomplete";
   }
 
-  fs::path snapshot_file_path(cache_model_dir + "snapshots/" +
-                                           latest_commit + "/" + filename);
+  fs::path snapshot_file_path(cache_model_dir + "snapshots/" + latest_commit +
+                              "/" + filename);
   fs::path refs_file_path(cache_model_dir + "refs/main");
 
   result.path = snapshot_file_path;
@@ -554,8 +551,8 @@ struct DownloadResult hf_hub_download(const std::string &repo_id,
   refs_file << latest_commit << std::endl;
   refs_file.close();
 
-  if (fs::exists(snapshot_file_path) &&
-      fs::exists(blob_file_path) && !force_download) {
+  if (fs::exists(snapshot_file_path) && fs::exists(blob_file_path) &&
+      !force_download) {
     log_info("Snapshot file exists. Using cached file.");
     return result;
   }
